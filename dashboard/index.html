@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <p class="eyebrow">TOKEN RADAR &middot; DEFI LLAMA SNAPSHOT <span id="as-of"></span></p>
+      <h1>Which pre-token protocol is worth farming next?</h1>
+      <p class="lede">Every protocol DefiLlama tracks that records no token, ranked by what its
+      launch would be worth if it were priced like the tokens that already trade in its own
+      category. No names are hard-coded: the ranking, the value and the farm plan are all
+      derived from the snapshot's own figures.</p>
+    </div>
+    <dl class="stats" id="stats"></dl>
+  </div>
+  <nav class="tabs" aria-label="Views">
+    <button type="button" data-view="board" class="tab active">Ranked board</button>
+    <button type="button" data-view="live" class="tab">Live tokens &mdash; already trading</button>
+    <button type="button" data-view="model" class="tab">How the value is modelled</button>
+  </nav>
+</header>
+
+<main>
+  <section id="view-board" class="view">
+    <div class="controls" role="search">
+      <label>Search <input id="q" type="search" placeholder="Protocol name or slug&hellip;" autocomplete="off"></label>
+      <label>Category
+        <select id="category"><option value="all">All categories</option></select>
+      </label>
+      <label>Chain
+        <select id="chain"><option value="all">All chains</option></select>
+      </label>
+      <label class="check"><input id="watchlist-only" type="checkbox"> Watchlist only</label>
+      <label>Sort by
+        <select id="sort">
+          <option value="implied">Implied value</option>
+          <option value="tvl">TVL</option>
+          <option value="growth">7-day growth</option>
+          <option value="age">Age (oldest first)</option>
+          <option value="name">Name A&ndash;Z</option>
+        </select>
+      </label>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div class="table-wrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th scope="col"><button type="button" data-sort="implied">Rank</button></th>
+            <th scope="col"><button type="button" data-sort="name">Protocol</button></th>
+            <th scope="col">Category</th>
+            <th scope="col">Chains</th>
+            <th scope="col" class="num"><button type="button" data-sort="tvl">TVL</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="growth">7d</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="age">Age</button></th>
+            <th scope="col" class="num"><button type="button" data-sort="implied">Implied value</button></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="hint">Click any row for its detail view: what it is, why it records no token,
+    the four factors behind its implied value, and the six steps to farm it.</p>
+    <article id="detail" class="detail" hidden></article>
+  </section>
+
+  <section id="view-live" class="view" hidden>
+    <h2>Live tokens &mdash; already trading, never ranked</h2>
+    <p>The board above holds only protocols that record no token. These are the largest
+    tokens that already trade, shown with the market's own value &mdash; the peer group the
+    model's multiples are taken from. A protocol here is not a launch to farm.</p>
+    <div class="table-wrap">
+      <table id="live-table">
+        <thead>
+          <tr>
+            <th scope="col">Protocol</th><th scope="col">Category</th><th scope="col">Chains</th>
+            <th scope="col" class="num">TVL</th><th scope="col" class="num">Market cap</th>
+            <th scope="col" class="num">MCap / TVL</th><th scope="col" class="num">7d</th>
+          </tr>
+        </thead>
+        <tbody id="live-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="view-model" class="view" hidden>
+    <h2>How the value is modelled</h2>
+    <p>One formula scores every row. Nothing in it names a protocol.</p>
+    <pre class="formula">implied = TVL &times; peerMultiple(category)
+        &times; (1 + clamp(change_7d, &minus;50%, +150%) &times; 0.35)
+        &times; (0.75 + 0.25 &times; min(ageDays, 1095) / 1095)
+        &times; (1 + 0.02 &times; min(chains &minus; 1, 5))</pre>
+    <div id="model-body"></div>
+    <h3>What &ldquo;records no token&rdquo; means</h3>
+    <p>A row says a protocol <em>records</em> no token: DefiLlama's snapshot carries no
+    CoinGecko id, no symbol and no market cap for it. That is not proof it has none &mdash;
+    a token may exist that the record does not carry. Rows the house watchlist leaves out
+    are flagged <span class="badge early">Early find</span>: they pass the same no-token
+    rule, but DefiLlama's parent-protocol record (not one of the snapshot's fields) may
+    link one to another protocol, so verify it before farming.</p>
+    <h3>What the radar does not do</h3>
+    <p>It does not predict whether or when a token is issued. An implied value is this
+    entry's own claim about what a launch would be worth <em>if</em> the protocol's record
+    stayed as it is. Farm with a fresh wallet, never pay to claim, and never put in more
+    than you can afford to leave locked for the hold period.</p>
+  </section>
+</main>
+
+<footer>
+  <p>Source: <span id="source"></span>. Snapshot as of <span id="as-of-2"></span>.
+  Built by a program that reads the sealed snapshot and nothing else; the page makes no
+  network requests. Model version <span id="model-version"></span>.</p>
+</footer>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
